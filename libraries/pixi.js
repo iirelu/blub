@@ -1,0 +1,1 @@
+<html><body>You are being <a href="https://raw.github.com/GoodBoyDigital/pixi.js/master/bin/pixi.js">redirected</a>.</body></html>
