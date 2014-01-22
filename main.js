@@ -8,6 +8,7 @@ document.getElementById("container").appendChild(renderer.view);
 var blub = PIXI.Sprite.fromImage("blub.png");
 blub.anchor.x = 0.5;
 blub.anchor.y = 0.5;
+blub.rotation = 0;
 
 var startTime = new Date().getTime();
 
@@ -24,7 +25,7 @@ function draw() {
   blub.position.y = (blub.position.y*5 + mouse.y)/6;
   
   var dist = Math.sqrt(Math.pow(blub.position.x-mouse.x, 2) + Math.pow(blub.position.y-mouse.y, 2));
-  audio.changeFrequency(dist*2);
+  audio.changeFrequency(dist*5);
   
   renderer.render(stage);
   requestAnimFrame(draw);
