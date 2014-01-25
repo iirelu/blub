@@ -1,11 +1,18 @@
 var audio = (function() {
-  var AudioContext = AudioContext || webkitAudioContext;
-  var context = new AudioContext();
+  var AudioContext = window.AudioContext || window.webkitAudioContext || null;
+  if(AudioContext === null) {
+    document.getElementById("volume").remove();
+    document.getElementById("volslider").remove();
+    console.log("no audio");
+    return undefined;
+  }
+
   var volumeSlider = document.getElementById("volume");
+  var context = new AudioContext();
   var buffer;
   var source = context.createBufferSource();
-  var loud = context.createGainNode();
-  var volume = context.createGainNode();
+  var loud = context.createGainNode ? context.createGainNode() : context.createGain();
+  var volume = context.createGainNode ? context.createGainNode() : context.createGain();
 
   var request = new XMLHttpRequest();
   request.open("GET", "rocket.ogg", true);

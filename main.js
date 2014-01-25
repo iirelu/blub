@@ -82,14 +82,13 @@ function draw() {
     particles.push(particle);
     stage.addChild(particles[particles.length-1].sprite);
 
-    ship.velocity.x += -velocity.x*0.001;
-    ship.velocity.y += -velocity.y*0.001;
+    ship.velocity.x += -velocity.x*0.005;
+    ship.velocity.y += -velocity.y*0.005;
 
-    audio.changeLoudness(1);
-  } else {
-    audio.changeLoudness(0);
   }
-
+  if(audio !== undefined) {
+    audio.changeLoudness(mousedown);
+  }
 
   renderer.render(stage);
   requestAnimFrame(draw);
@@ -98,7 +97,8 @@ function draw() {
 }
 
 var mousedown = 0;
-stage.mousedown = function() {
+stage.mousedown = function(e) {
+  e.originalEvent.preventDefault();
   mousedown = 1;
 }
 
