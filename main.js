@@ -26,12 +26,18 @@ stage.addChild(ship);
 
 var particles = [];
 
-var startTime = new Date().getTime();
+var time = {
+  start: new Date().getTime(),
+  current: new Date().getTime(),
+  last: new Date().getTime(),
+  millis: 0
+}
 
 requestAnimFrame(draw);
 
 function draw() {
-  var time = (new Date().getTime() - startTime) / 1000.0;
+  time.current = new Date().getTime() - time.start;
+  time.millis = time.current - time.last;
   var mouse = stage.getMousePosition();
 
   ship.rotation = Math.PI/2 + Math.atan2(mouse.y-ship.position.y, mouse.x-ship.position.x);
@@ -41,10 +47,14 @@ function draw() {
       continue;
     }
 
-    particles[i].move();
-    particles[i].sprite.alpha += -0.01;
+    particles[i].move(time.millis/16);
+    particles[i].sprite.alpha += (-0.01/16)*time.millis;
     if(particles[i].sprite.alpha < 0) {
-      particles.splice(i, i);
+
+      if(particles[i].sprite.stage === stage) {
+        stage.removeChild(particles[i].sprite);
+      }
+      particles.splice(i, 1);
     }
   }
 
@@ -56,8 +66,8 @@ function draw() {
     var direction = new PIXI.Point(Math.cos(ship.rotation+Math.PI/2),
         Math.sin(ship.rotation+Math.PI/2));
 
-    var position = {x: ship.position.x + direction.x*15 + Math.random()-0.5,
-      y: ship.position.y + direction.y*15 + Math.random()-0.5};
+    var position = {x: ship.position.x + direction.x*18 + Math.random()-0.5,
+      y: ship.position.y + direction.y*18 + Math.random()-0.5};
 
     var rotation = (Math.random()-0.5) * Math.PI*2;
 
@@ -68,14 +78,14 @@ function draw() {
     velocity.y += ship.velocity.y;
 
     var particle = new Particle(smoke, position, rotation, velocity);
-    particle.opacity += Math.random();
+    particle.sprite.alpha = 0.7+Math.random()*0.6;
     particles.push(particle);
     stage.addChild(particles[particles.length-1].sprite);
 
     ship.velocity.x += -velocity.x*0.001;
     ship.velocity.y += -velocity.y*0.001;
 
-    audio.changeLoudness(5);
+    audio.changeLoudness(1);
   } else {
     audio.changeLoudness(0);
   }
@@ -83,6 +93,8 @@ function draw() {
 
   renderer.render(stage);
   requestAnimFrame(draw);
+
+  time.last = time.current;
 }
 
 var mousedown = 0;

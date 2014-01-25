@@ -2,28 +2,41 @@ var audio = (function() {
   var AudioContext = AudioContext || webkitAudioContext;
   var context = new AudioContext();
   var volumeSlider = document.getElementById("volume");
+  var buffer;
+  var source = context.createBufferSource();
+  var loud = context.createGainNode();
+  var volume = context.createGainNode();
 
-  var oscillator = context.createOscillator();
-  oscillator.type = "sine";
-  oscillator.frequency.value = 114;
+  var request = new XMLHttpRequest();
+  request.open("GET", "rocket.ogg", true);
+  request.responseType = "arraybuffer";
+  request.onload = function() {
+    context.decodeAudioData(request.response, function(buf) {
+      buffer = buf;
+      source.buffer = buffer;
+      source.loop = true;
+      source.playbackRate.value = 2.4;
+      source.start(0);
+    });
+  }
+  request.send();
 
-  var loudness = context.createGain();
-  loudness.gain.value = 1;
-  console.log(loudness);
+  source.connect(loud);
+  loud.connect(volume);
+  volume.connect(context.destination);
+  
+  loud.gain.value = 0;
+  volume.gain.value = parseInt(volumeSlider.value)/100;
 
-  var volslider = context.createGain();
-  volslider.gain.value = parseInt(volumeSlider.value)/100;
-
-  oscillator.connect(loudness);
-  loudness.connect(volslider);
-  volslider.connect(context.destination);
-
-  oscillator.start(0);
+  volumeSlider.addEventListener("input", function() {
+    volume.gain.value = parseInt(volumeSlider.value)/100;
+  });
+  console.log(volumeSlider);
 
   return {
-    changeLoudness: function(loud) {
-      loudness.gain.value = loud;
-      volslider.gain.value = parseInt(volumeSlider.value)/100;
-    }
+    changeLoudness: function(l) {
+      loud.gain.value = l;
+    },
+    source: source
   }
-}())
+}());

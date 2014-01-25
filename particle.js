@@ -14,10 +14,10 @@ function Particle(image, position, rotation, velocity) {
   this.velocity = velocity || {x: 0, y: 0, rotation: 0};
 }
 
-Particle.prototype.move = function() {
-  this.sprite.position.x += this.velocity.x;
-  this.sprite.position.y += this.velocity.y;
-  this.sprite.rotation += this.velocity.rotation;
+Particle.prototype.move = function(mul) {
+  this.sprite.position.x += this.velocity.x*mul;
+  this.sprite.position.y += this.velocity.y*mul;
+  this.sprite.rotation += this.velocity.rotation*mul;
 }
 
 Particle.prototype.force = function(delta) {
