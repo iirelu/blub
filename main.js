@@ -1,6 +1,6 @@
 var width = window.innerWidth, height = window.innerHeight-150;
 
-var stage = new PIXI.Stage(0x231F30);
+var stage = new PIXI.Stage(0x2e282b);
 var renderer = PIXI.autoDetectRenderer(width, height);
 document.getElementById("container").appendChild(renderer.view);
 
