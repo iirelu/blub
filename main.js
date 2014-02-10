@@ -1,4 +1,4 @@
-var width = 500, height = 400;
+var width = window.innerWidth, height = window.innerHeight-150;
 
 var stage = new PIXI.Stage(0x231F30);
 var renderer = PIXI.autoDetectRenderer(width, height);
@@ -48,7 +48,7 @@ function draw() {
     }
 
     particles[i].move(time.millis/16);
-    particles[i].sprite.alpha += (-0.01/16)*time.millis;
+    particles[i].sprite.alpha += -0.01 * time.millis/16;
     if(particles[i].sprite.alpha < 0) {
 
       if(particles[i].sprite.stage === stage) {
@@ -58,8 +58,8 @@ function draw() {
     }
   }
 
-  ship.position.x += ship.velocity.x;
-  ship.position.y += ship.velocity.y;
+  ship.position.x += ship.velocity.x * time.millis/16;
+  ship.position.y += ship.velocity.y * time.millis/16;
 
   if(mousedown) {
     var smoke = textures.smoke[Math.floor(Math.random()*12)];
@@ -82,12 +82,22 @@ function draw() {
     particles.push(particle);
     stage.addChild(particles[particles.length-1].sprite);
 
-    ship.velocity.x += -velocity.x*0.005;
-    ship.velocity.y += -velocity.y*0.005;
+    ship.velocity.x += (ship.velocity.x - velocity.x)*0.01*time.millis;
+    ship.velocity.y += (ship.velocity.y - velocity.y)*0.01*time.millis;
 
   }
   if(audio !== undefined) {
-    audio.changeLoudness(mousedown);
+    audio.setLoudness(mousedown);
+    audio.set(
+        //position
+        (ship.position.x/width*3)-0.5,
+        (ship.position.y/width*3)-0.5,
+        2,
+        //velocity
+        ship.velocity.x*500,
+        0,
+        ship.velocity.y*500
+    );
   }
 
   renderer.render(stage);
@@ -102,6 +112,13 @@ stage.mousedown = function(e) {
   mousedown = 1;
 }
 
-stage.mouseup = function() {
+window.addEventListener("mouseup", function() {
   mousedown = 0;
-}
+});
+
+window.addEventListener("resize", function() {
+  width = window.innerWidth;
+  height = window.innerHeight-150;
+
+  renderer.resize(width, height);
+});

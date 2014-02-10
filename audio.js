@@ -11,8 +11,9 @@ var audio = (function() {
   var context = new AudioContext();
   var buffer;
   var source = context.createBufferSource();
-  var loud = context.createGainNode ? context.createGainNode() : context.createGain();
-  var volume = context.createGainNode ? context.createGainNode() : context.createGain();
+  var loud = context.createGain();
+  var panner = context.createPanner();
+  var volume = context.createGain();
 
   var request = new XMLHttpRequest();
   request.open("GET", "rocket.ogg", true);
@@ -29,7 +30,8 @@ var audio = (function() {
   request.send();
 
   source.connect(loud);
-  loud.connect(volume);
+  loud.connect(panner);
+  panner.connect(volume);
   volume.connect(context.destination);
   
   loud.gain.value = 0;
@@ -38,12 +40,15 @@ var audio = (function() {
   volumeSlider.addEventListener("input", function() {
     volume.gain.value = parseInt(volumeSlider.value)/100;
   });
-  console.log(volumeSlider);
 
   return {
-    changeLoudness: function(l) {
-      loud.gain.value = l;
+    setLoudness: function(loudness) {
+      loud.gain.value = loudness;
     },
-    source: source
+    set: function(posx, posy, posz, velx, vely, velz) {
+      panner.setPosition(posx, posy, posz);
+      panner.setVelocity(velx, vely, velz);
+    },
+    context: context
   }
 }());
