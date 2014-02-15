@@ -24,7 +24,8 @@ ship.position.y = height/2;
 ship.velocity = {x: 0, y: 0};
 stage.addChild(ship);
 
-var particles = [];
+var particles = new PIXI.SpriteBatch();
+stage.addChild(particles);
 
 var time = {
   start: new Date().getTime(),
@@ -38,30 +39,29 @@ requestAnimFrame(draw);
 function draw() {
   time.current = new Date().getTime() - time.start;
   time.millis = time.current - time.last;
-  var mouse = stage.getMousePosition();
 
   ship.rotation = Math.PI/2 + Math.atan2(mouse.y-ship.position.y, mouse.x-ship.position.x);
 
-  for(var i = 0; i<particles.length; i++) {
-    if(particles[i] === undefined) {
+  for(var i = 0; i<particles.children.length; i++) {
+    if(particles.children[i] === undefined) {
       continue;
     }
 
-    particles[i].move(time.millis/16);
-    particles[i].sprite.alpha += -0.01 * time.millis/16;
-    if(particles[i].sprite.alpha < 0) {
+    var particle = particles.children[i].particle;
+    particle.move(time.millis/16);
+    particle.sprite.alpha += -0.01 * time.millis/16;
+    if(particle.sprite.alpha < 0) {
 
-      if(particles[i].sprite.stage === stage) {
-        stage.removeChild(particles[i].sprite);
+      if(particle.sprite.stage === stage) {
+        particles.removeChild(particle.sprite);
       }
-      particles.splice(i, 1);
     }
   }
 
   ship.position.x += ship.velocity.x * time.millis/16;
   ship.position.y += ship.velocity.y * time.millis/16;
 
-  if(mousedown) {
+  if(mouse.down) {
     var smoke = textures.smoke[Math.floor(Math.random()*12)];
     var direction = new PIXI.Point(Math.cos(ship.rotation+Math.PI/2),
         Math.sin(ship.rotation+Math.PI/2));
@@ -79,42 +79,26 @@ function draw() {
 
     var particle = new Particle(smoke, position, rotation, velocity);
     particle.sprite.alpha = 0.7+Math.random()*0.6;
-    particles.push(particle);
-    stage.addChild(particles[particles.length-1].sprite);
+    particles.addChild(particle.sprite);
 
     ship.velocity.x += (ship.velocity.x - velocity.x)*0.01*time.millis;
     ship.velocity.y += (ship.velocity.y - velocity.y)*0.01*time.millis;
 
   }
   if(audio !== undefined) {
-    audio.setLoudness(mousedown);
-    audio.set(
-        //position
-        (ship.position.x/width*3)-0.5,
-        (ship.position.y/width*3)-0.5,
-        2,
-        //velocity
-        ship.velocity.x*500,
-        0,
-        ship.velocity.y*500
+    audio.setLoudness(mouse.down);
+    audio.setPosition(
+        (ship.position.x/width*3)-0.5, (ship.position.y/width*3)-0.5
     );
   }
 
   renderer.render(stage);
-  requestAnimFrame(draw);
 
   time.last = time.current;
+  requestAnimFrame(draw);
+
 }
 
-var mousedown = 0;
-stage.mousedown = function(e) {
-  e.originalEvent.preventDefault();
-  mousedown = 1;
-}
-
-window.addEventListener("mouseup", function() {
-  mousedown = 0;
-});
 
 window.addEventListener("resize", function() {
   width = window.innerWidth;

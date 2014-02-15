@@ -45,9 +45,8 @@ var audio = (function() {
     setLoudness: function(loudness) {
       loud.gain.value = loudness;
     },
-    set: function(posx, posy, posz, velx, vely, velz) {
-      panner.setPosition(posx, posy, posz);
-      panner.setVelocity(velx, vely, velz);
+    setPosition: function(posx, posy) {
+      panner.setPosition(posx, posy, 1);
     },
     context: context
   }

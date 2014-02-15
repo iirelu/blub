@@ -12,6 +12,7 @@ function Particle(image, position, rotation, velocity) {
   this.sprite.position.y = position ? position.y : 0;
   this.sprite.rotation = rotation || 0;
   this.velocity = velocity || {x: 0, y: 0, rotation: 0};
+  this.sprite.particle = this;
 }
 
 Particle.prototype.move = function(mul) {
